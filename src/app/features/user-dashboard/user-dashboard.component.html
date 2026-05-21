@@ -1,0 +1,65 @@
+<div class="dashboard">
+
+  <header class="dashboard-header">
+    <h1>User Management</h1>
+
+    <div class="header-controls">
+      <input
+        type="text"
+        placeholder="Search users"
+        aria-label="Search users"
+        (input)="onSearch($event)"
+      />
+
+      <button
+        type="button"
+        aria-label="Add User"
+        [disabled]="showForm"
+        (click)="showForm = true"
+      >
+        Add User
+      </button>
+
+      <!-- WebSocket status indicator — used by Playwright tests via data-testid -->
+      <span
+        class="ws-status"
+        data-testid="ws-status"
+        [attr.data-status]="wsStatus"
+        [attr.aria-label]="'Connection: ' + wsStatus"
+      >
+        {{ wsStatus }}
+      </span>
+    </div>
+  </header>
+
+  @if (isLoading) {
+    <div class="loading" role="status" aria-label="Loading users">
+      Loading users...
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="error-alert" role="alert">
+      {{ errorMessage }}
+      <button type="button" (click)="onRetry()">Retry</button>
+    </div>
+  }
+
+  @if (showForm) {
+    <div class="form-panel" data-testid="form-panel">
+      <app-user-form
+        (userCreated)="onUserCreated($event)"
+        (cancelled)="showForm = false"
+      />
+    </div>
+  }
+
+  @if (!isLoading && !errorMessage) {
+    <app-user-grid
+      [rowData]="users"
+      [quickFilterText]="searchText"
+      (rowSelected)="onRowSelected($event)"
+    />
+  }
+
+</div>
